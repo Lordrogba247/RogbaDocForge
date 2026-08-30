@@ -46,7 +46,9 @@ export default function Home() {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [uploadedImageName, setUploadedImageName] = useState(null);
   const {
-    isAuthenticated
+    isAuthenticated,
+    user,
+    logout
   } = useAuth();
   const ocrMutation = trpc.conversion.ocrExtract.useMutation();
   const convertMutation = trpc.conversion.convertText.useMutation();
@@ -74,10 +76,6 @@ export default function Home() {
       toast.error("Please upload an image first.");
       return;
     }
-    if (!isAuthenticated) {
-      toast.error("Please sign in to use OCR.");
-      return;
-    }
     setIsExtracting(true);
     try {
       const mimeType = uploadedImage.match(/^data:(image\/\w+);/)?.[1] || "image/jpeg";
@@ -96,10 +94,6 @@ export default function Home() {
   const handleConvert = useCallback(async () => {
     if (!text.trim()) {
       toast.error("Please enter some text to convert.");
-      return;
-    }
-    if (!isAuthenticated) {
-      toast.error("Please sign in to convert documents.");
       return;
     }
     setIsConverting(true);
@@ -193,7 +187,7 @@ export default function Home() {
                     <X className="w-4 h-4" />
                   </button>}
                 </label>
-                {uploadedImage && <Button onClick={handleExtractOCR} disabled={isExtracting || !isAuthenticated} variant="outline" className="shrink-0">
+                {uploadedImage && <Button onClick={handleExtractOCR} disabled={isExtracting} variant="outline" className="shrink-0">
                   {isExtracting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
                   Extract
                 </Button>}
@@ -227,7 +221,7 @@ Bob, 25, London`} className="min-h-[280px] font-mono text-sm resize-y bg-seconda
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-              <Button onClick={handleConvert} disabled={isConverting || !text.trim() || !isAuthenticated} className="flex-1 h-12 text-base font-semibold gap-2 bg-primary hover:bg-primary/90">
+              <Button onClick={handleConvert} disabled={isConverting || !text.trim()} className="flex-1 h-12 text-base font-semibold gap-2 bg-primary hover:bg-primary/90">
                 {isConverting ? <>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   Generating...
@@ -245,12 +239,12 @@ Bob, 25, London`} className="min-h-[280px] font-mono text-sm resize-y bg-seconda
           </div>
         </div>
 
-        {/* Login prompt */}
+        {/* Sign-in nudge (optional now — conversion works either way) */}
         {!isAuthenticated && <div className="mt-6 text-center">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent/50 border border-accent">
             <LogIn className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">
-              Sign in to convert documents and save history
+              Sign in to save your conversion history
             </span>
             <Button variant="outline" size="sm" onClick={startLogin} className="ml-2">
               Sign In
@@ -258,11 +252,17 @@ Bob, 25, London`} className="min-h-[280px] font-mono text-sm resize-y bg-seconda
           </div>
         </div>}
 
-        {/* Quick History Link */}
-        {isAuthenticated && <div className="mt-6 text-center">
+        {/* Signed-in bar: history link + who's signed in + sign out */}
+        {isAuthenticated && <div className="mt-6 flex flex-col items-center gap-2 text-center">
           <a href="/history" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
             View your conversion history &rarr;
           </a>
+          <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <span>Signed in{user?.name ? ` as ${user.name}` : ""}</span>
+            <button type="button" onClick={logout} className="text-primary hover:text-primary/80 font-medium underline underline-offset-2">
+              Sign out
+            </button>
+          </div>
         </div>}
       </div>
     </section>
@@ -270,7 +270,7 @@ Bob, 25, London`} className="min-h-[280px] font-mono text-sm resize-y bg-seconda
     {/* Footer */}
     <footer className="border-t border-border py-8">
       <div className="container text-center text-sm text-muted-foreground">
-        <p>ROGBA DocForge &copy; {new Date().getFullYear()}</p>
+        <p>Built with Tesseract OCR &middot; python-docx &middot; python-pptx &middot; openpyxl &middot; WeasyPrint</p>
       </div>
     </footer>
   </div>;
