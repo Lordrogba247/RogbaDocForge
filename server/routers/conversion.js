@@ -9,11 +9,14 @@ import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import { fileURLToPath } from "url";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const SCRIPTS_DIR = path.join(__dirname, "..", "python_scripts");
-const TEMP_DIR = path.join(__dirname, "..", "temp");
+
+// Use process.cwd() (the project root) instead of __dirname here — after
+// the production build bundles this file into dist/index.js, __dirname no
+// longer points at server/routers, so a relative "../python_scripts" would
+// resolve to the wrong folder on Render. process.cwd() always points at
+// the project root both locally (npm run dev) and in production.
+const SCRIPTS_DIR = path.join(process.cwd(), "server", "python_scripts");
+const TEMP_DIR = path.join(process.cwd(), "server", "temp");
 if (!fs.existsSync(TEMP_DIR)) {
   fs.mkdirSync(TEMP_DIR, {
     recursive: true
@@ -90,7 +93,7 @@ async function saveGeneratedFile(userId, format, text, title, scriptName, output
     try {
       fs.unlinkSync(inputPath);
       fs.unlinkSync(outputPath);
-    } catch {}
+    } catch { }
     return {
       url,
       key: storageKey
@@ -99,7 +102,7 @@ async function saveGeneratedFile(userId, format, text, title, scriptName, output
     try {
       if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
       if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
-    } catch {}
+    } catch { }
     throw err;
   }
 }
@@ -168,7 +171,7 @@ export const conversionRouter = router({
       const result = await runPythonScript("ocr_extract.py", [imagePath]);
       try {
         fs.unlinkSync(imagePath);
-      } catch {}
+      } catch { }
       if (result.exitCode !== 0) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -181,7 +184,7 @@ export const conversionRouter = router({
     } catch (err) {
       try {
         if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-      } catch {}
+      } catch { }
       throw err;
     }
   }),
