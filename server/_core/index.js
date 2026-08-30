@@ -3,7 +3,6 @@ import express from "express";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers.js";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -35,7 +34,6 @@ async function startServer() {
     limit: "50mb",
     extended: true
   }));
-  registerStorageProxy(app);
   // tRPC API
   app.use("/api/trpc", createExpressMiddleware({
     router: appRouter,

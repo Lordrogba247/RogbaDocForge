@@ -1,100 +1,68 @@
-// Preconfigured storage helpers for Manus WebDev templates
-// Uploads via Forge Server presigned URL to S3 (PUT direct).
-// Downloads return /manus-storage/{key} paths served via 307 redirect.
+// Storage helpers backed by Supabase Storage (a public bucket named
+// "conversions"). Replaces the old Manus-only "Forge" storage backend,
+// which only worked inside Manus's own hosting.
 
-import crypto from "node:crypto";
+import { createClient } from "@supabase/supabase-js";
 import { ENV } from "./_core/env";
-function getForgeConfig() {
-  const forgeUrl = ENV.forgeApiUrl;
-  const forgeKey = ENV.forgeApiKey;
-  if (!forgeUrl || !forgeKey) {
-    throw new Error("Storage config missing: set BUILT_IN_FORGE_API_URL and BUILT_IN_FORGE_API_KEY");
+
+const BUCKET = "conversions";
+
+let _supabaseAdmin = null;
+function getSupabaseAdmin() {
+  if (_supabaseAdmin) return _supabaseAdmin;
+  if (!ENV.supabaseUrl || !ENV.supabaseServiceRoleKey) {
+    throw new Error(
+      "Storage config missing: set VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (the service_role secret key from Supabase > Settings > API Keys)."
+    );
   }
-  return {
-    forgeUrl: forgeUrl.replace(/\/+$/, ""),
-    forgeKey
-  };
+  // The service role key bypasses Row Level Security, so this client must
+  // only ever be used on the server — never sent to the browser.
+  _supabaseAdmin = createClient(ENV.supabaseUrl, ENV.supabaseServiceRoleKey);
+  return _supabaseAdmin;
 }
+
 function normalizeKey(relKey) {
   return relKey.replace(/^\/+/, "");
 }
-function appendHashSuffix(relKey) {
-  const hash = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
-  const lastDot = relKey.lastIndexOf(".");
-  if (lastDot === -1) return `${relKey}_${hash}`;
-  return `${relKey.slice(0, lastDot)}_${hash}${relKey.slice(lastDot)}`;
-}
+
+/**
+ * Upload a file's contents and return its key + a public URL.
+ * @example
+ * const { url } = await storagePut("conversions/123/file.docx", buffer, "application/...");
+ */
 export async function storagePut(relKey, data, contentType = "application/octet-stream") {
-  const {
-    forgeUrl,
-    forgeKey
-  } = getForgeConfig();
-  const key = appendHashSuffix(normalizeKey(relKey));
-
-  // 1. Get presigned PUT URL from Forge
-  const presignUrl = new URL("v1/storage/presign/put", forgeUrl + "/");
-  presignUrl.searchParams.set("path", key);
-  const presignResp = await fetch(presignUrl, {
-    headers: {
-      Authorization: `Bearer ${forgeKey}`
-    }
+  const supabase = getSupabaseAdmin();
+  const key = normalizeKey(relKey);
+  const { error } = await supabase.storage.from(BUCKET).upload(key, data, {
+    contentType,
+    upsert: true
   });
-  if (!presignResp.ok) {
-    const msg = await presignResp.text().catch(() => presignResp.statusText);
-    throw new Error(`Storage presign failed (${presignResp.status}): ${msg}`);
+  if (error) {
+    throw new Error(`Storage upload failed: ${error.message}`);
   }
-  const {
-    url: s3Url
-  } = await presignResp.json();
-  if (!s3Url) throw new Error("Forge returned empty presign URL");
-
-  // 2. PUT file directly to S3
-  const blob = typeof data === "string" ? new Blob([data], {
-    type: contentType
-  }) : new Blob([data], {
-    type: contentType
-  });
-  const uploadResp = await fetch(s3Url, {
-    method: "PUT",
-    headers: {
-      "Content-Type": contentType
-    },
-    body: blob
-  });
-  if (!uploadResp.ok) {
-    throw new Error(`Storage upload to S3 failed (${uploadResp.status})`);
-  }
+  const { data: publicUrlData } = supabase.storage.from(BUCKET).getPublicUrl(key);
   return {
     key,
-    url: `/manus-storage/${key}`
+    url: publicUrlData.publicUrl
   };
 }
+
 export async function storageGet(relKey) {
+  const supabase = getSupabaseAdmin();
   const key = normalizeKey(relKey);
+  const { data: publicUrlData } = supabase.storage.from(BUCKET).getPublicUrl(key);
   return {
     key,
-    url: `/manus-storage/${key}`
+    url: publicUrlData.publicUrl
   };
 }
+
 export async function storageGetSignedUrl(relKey) {
-  const {
-    forgeUrl,
-    forgeKey
-  } = getForgeConfig();
+  const supabase = getSupabaseAdmin();
   const key = normalizeKey(relKey);
-  const getUrl = new URL("v1/storage/presign/get", forgeUrl + "/");
-  getUrl.searchParams.set("path", key);
-  const resp = await fetch(getUrl, {
-    headers: {
-      Authorization: `Bearer ${forgeKey}`
-    }
-  });
-  if (!resp.ok) {
-    const msg = await resp.text().catch(() => resp.statusText);
-    throw new Error(`Storage signed URL failed (${resp.status}): ${msg}`);
+  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(key, 60 * 60);
+  if (error) {
+    throw new Error(`Storage signed URL failed: ${error.message}`);
   }
-  const {
-    url
-  } = await resp.json();
-  return url;
+  return data.signedUrl;
 }

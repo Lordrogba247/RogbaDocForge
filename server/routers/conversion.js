@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { protectedProcedure, router } from "../_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import { storagePut } from "../storage";
 import { getDb } from "../db";
 import { conversions } from "../../drizzle/schema";
@@ -59,6 +59,10 @@ function runPythonScript(scriptName, args) {
     }, 60000);
   });
 }
+
+// userId is now optional (null for anonymous/guest visitors). The file is
+// still generated and returned either way — only the "save to history in
+// the database" step is skipped when there's no logged-in user.
 async function saveGeneratedFile(userId, format, text, title, scriptName, outputExt, mimeType) {
   const inputId = crypto.randomUUID();
   const inputPath = path.join(TEMP_DIR, `${inputId}.txt`);
@@ -75,25 +79,29 @@ async function saveGeneratedFile(userId, format, text, title, scriptName, output
       });
     }
     const fileBuffer = fs.readFileSync(outputPath);
-    const storageKey = `conversions/${userId}/${outputId}_${outputFileName}`;
+    // Anonymous conversions get filed under a shared "guest" folder in
+    // storage since there's no userId to namespace them by.
+    const storageKey = `conversions/${userId ?? "guest"}/${outputId}_${outputFileName}`;
     const {
       url
     } = await storagePut(storageKey, fileBuffer, mimeType);
-    const db = await getDb();
-    if (db) {
-      await db.insert(conversions).values({
-        userId,
-        format,
-        text: text.substring(0, 10000),
-        fileName: outputFileName,
-        fileUrl: url,
-        fileKey: storageKey
-      });
+    if (userId) {
+      const db = await getDb();
+      if (db) {
+        await db.insert(conversions).values({
+          userId,
+          format,
+          text: text.substring(0, 10000),
+          fileName: outputFileName,
+          fileUrl: url,
+          fileKey: storageKey
+        });
+      }
     }
     try {
       fs.unlinkSync(inputPath);
       fs.unlinkSync(outputPath);
-    } catch { }
+    } catch {}
     return {
       url,
       key: storageKey
@@ -102,13 +110,15 @@ async function saveGeneratedFile(userId, format, text, title, scriptName, output
     try {
       if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
       if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
-    } catch { }
+    } catch {}
     throw err;
   }
 }
 const formatSchema = z.enum(["docx", "pdf", "pptx", "xlsx"]);
 export const conversionRouter = router({
-  convertText: protectedProcedure.input(z.object({
+  // publicProcedure: anyone can convert, signed in or not. History is only
+  // saved to the database when ctx.user is present (see saveGeneratedFile).
+  convertText: publicProcedure.input(z.object({
     text: z.string().min(1, "Text is required"),
     format: formatSchema,
     title: z.string().min(1).max(200)
@@ -121,7 +131,7 @@ export const conversionRouter = router({
       format,
       title
     } = input;
-    const userId = ctx.user.id;
+    const userId = ctx.user?.id ?? null;
     const config = {
       docx: {
         script: "generate_docx.py",
@@ -151,12 +161,12 @@ export const conversionRouter = router({
       fileName: title.replace(/[^a-zA-Z0-9]/g, "_") + "." + cfg.ext
     };
   }),
-  ocrExtract: protectedProcedure.input(z.object({
+  // publicProcedure: OCR extraction also works for anonymous visitors.
+  ocrExtract: publicProcedure.input(z.object({
     imageData: z.string().min(1, "Image data is required"),
     mimeType: z.enum(["image/jpeg", "image/png", "image/webp"])
   })).mutation(async ({
-    input,
-    ctx
+    input
   }) => {
     const {
       imageData,
@@ -171,7 +181,7 @@ export const conversionRouter = router({
       const result = await runPythonScript("ocr_extract.py", [imagePath]);
       try {
         fs.unlinkSync(imagePath);
-      } catch { }
+      } catch {}
       if (result.exitCode !== 0) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -184,10 +194,12 @@ export const conversionRouter = router({
     } catch (err) {
       try {
         if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-      } catch { }
+      } catch {}
       throw err;
     }
   }),
+  // Still requires login — there's nothing to show an anonymous visitor
+  // since their past conversions were never saved.
   getHistory: protectedProcedure.query(async ({
     ctx
   }) => {
