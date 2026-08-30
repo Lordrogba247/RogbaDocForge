@@ -36,6 +36,15 @@ RUN npm install --legacy-peer-deps --production=false
 
 # Copy the rest of the project and build
 COPY . .
+
+# Vite bakes VITE_* env vars into the frontend at build time, so they must
+# be explicitly passed in as build args here — Render's runtime env vars
+# alone aren't visible during `docker build`.
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+
 RUN npm run build
 
 ENV NODE_ENV=production
