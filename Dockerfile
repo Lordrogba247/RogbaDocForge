@@ -3,7 +3,7 @@
 # Python, Tesseract OCR, or the system libraries WeasyPrint needs to render
 # PDFs — so we use a Dockerfile to install everything explicitly.
 
-FROM node:20-slim
+FROM node:22-slim
 
 # System dependencies:
 # - python3 / pip: to run the conversion scripts in server/python_scripts
