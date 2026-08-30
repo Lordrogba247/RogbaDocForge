@@ -270,7 +270,7 @@ Bob, 25, London`} className="min-h-[280px] font-mono text-sm resize-y bg-seconda
     {/* Footer */}
     <footer className="border-t border-border py-8">
       <div className="container text-center text-sm text-muted-foreground">
-        <p>Built with Tesseract OCR &middot; python-docx &middot; python-pptx &middot; openpyxl &middot; WeasyPrint</p>
+        <p>RogbaDocForge &copy; {new Date().getFullYear()} - All rights reserved</p>
       </div>
     </footer>
   </div>;
