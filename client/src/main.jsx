@@ -57,3 +57,10 @@ createRoot(document.getElementById("root")).render(<trpc.Provider client={trpcCl
       <App />
     </QueryClientProvider>
   </trpc.Provider>);
+
+// Offline PWA (29): cache app shell; editor text is autosaved to localStorage.
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}

@@ -3,18 +3,22 @@ import { startLogin } from "@/const";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { FileText, FileSpreadsheet, Presentation, Download, Trash2, Clock, ArrowLeft, LogIn } from "lucide-react";
+import { FileText, FileSpreadsheet, Presentation, Download, Trash2, Clock, ArrowLeft, LogIn, Code2, Braces } from "lucide-react";
 const formatIcons = {
   docx: <FileText className="w-4 h-4" />,
   pdf: <FileText className="w-4 h-4" />,
   pptx: <Presentation className="w-4 h-4" />,
-  xlsx: <FileSpreadsheet className="w-4 h-4" />
+  xlsx: <FileSpreadsheet className="w-4 h-4" />,
+  html: <Code2 className="w-4 h-4" />,
+  md: <Braces className="w-4 h-4" />
 };
 const formatColors = {
   docx: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
   pdf: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
   pptx: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
-  xlsx: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+  xlsx: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+  html: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
+  md: "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
 };
 export default function History() {
   const {

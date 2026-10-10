@@ -5,7 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { FileText, FileSpreadsheet, Presentation, ImageIcon, Upload, X, Sparkles, Loader2, ArrowDownToLine, LogIn } from "lucide-react";
+import SmartFormatPanel from "@/components/SmartFormatPanel";
+import UploadZone from "@/components/UploadZone";
+import LivePreview from "@/components/LivePreview";
+import BatchPanel from "@/components/BatchPanel";
+import AIPanel from "@/components/AIPanel";
+import BrandKitPanel from "@/components/BrandKitPanel";
+import WorkspacePanels from "@/components/WorkspacePanels";
+import ImagePanel from "@/components/ImagePanel";
+import { useLanguage, LanguagePanel, OfflinePanel, SharePanel } from "@/components/LocaleShare";
+import { FileText, FileSpreadsheet, Presentation, ImageIcon, Upload, X, Sparkles, Loader2, ArrowDownToLine, LogIn, Code2, Braces } from "lucide-react";
 const formatConfig = {
   docx: {
     label: "Word",
@@ -34,10 +43,26 @@ const formatConfig = {
     color: "bg-emerald-50 border-emerald-200 text-emerald-700 hover:border-emerald-400 hover:bg-emerald-100",
     darkColor: "dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-300 dark:hover:border-emerald-600 dark:hover:bg-emerald-900/40",
     ext: "xlsx"
+  },
+  html: {
+    label: "HTML",
+    icon: <Code2 className="w-5 h-5" />,
+    color: "bg-violet-50 border-violet-200 text-violet-700 hover:border-violet-400 hover:bg-violet-100",
+    darkColor: "dark:bg-violet-950/40 dark:border-violet-800 dark:text-violet-300 dark:hover:border-violet-600 dark:hover:bg-violet-900/40",
+    ext: "html"
+  },
+  md: {
+    label: "Markdown",
+    icon: <Braces className="w-5 h-5" />,
+    color: "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-slate-100",
+    darkColor: "dark:bg-slate-950/40 dark:border-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-900/40",
+    ext: "md"
   }
 };
 export default function Home() {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(() => {
+    try { return localStorage.getItem("rdf_offline_text") || ""; } catch { return ""; }
+  });
   const [selectedFormat, setSelectedFormat] = useState("pdf");
   const [isConverting, setIsConverting] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -45,6 +70,31 @@ export default function Home() {
   const [downloadFileName, setDownloadFileName] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [uploadedImageName, setUploadedImageName] = useState(null);
+  const [smartOptions, setSmartOptions] = useState({
+    template: "blank",
+    academic: "none",
+    theme: "modern",
+    font: "",
+    fontSize: 11,
+    lineSpacing: 1.15,
+    align: "left",
+    autoHeadings: true,
+    toc: false,
+    cover: false,
+    coverName: "",
+    coverDate: "",
+    coverStyle: "modern",
+    header: "",
+    footer: "",
+    pageNumbers: true,
+    differentFirstPage: true,
+    watermark: "",
+    signatureName: "",
+    signatureTitle: "",
+    brandAccent: "",
+    images: [],
+  });
+  const { lang, setLang } = useLanguage();
   const {
     isAuthenticated,
     user,
@@ -103,7 +153,8 @@ export default function Home() {
       const result = await convertMutation.mutateAsync({
         text: text.trim(),
         format: selectedFormat,
-        title: text.trim().split("\n")[0].substring(0, 80) || "Document"
+        title: text.trim().split("\n")[0].substring(0, 80) || "Document",
+        options: smartOptions,
       });
       setDownloadUrl(result.url);
       setDownloadFileName(result.fileName);
@@ -113,7 +164,7 @@ export default function Home() {
     } finally {
       setIsConverting(false);
     }
-  }, [text, selectedFormat, isAuthenticated, convertMutation]);
+  }, [text, selectedFormat, smartOptions, convertMutation]);
   const handleDownload = useCallback(() => {
     if (downloadUrl) {
       const a = document.createElement("a");
@@ -146,10 +197,13 @@ export default function Home() {
         <div className="bg-card rounded-2xl border border-border shadow-lg shadow-primary/5 overflow-hidden">
           {/* Format Selector */}
           <div className="p-6 border-b border-border">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-              Output Format
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                Output Format
+              </h2>
+              <LanguagePanel lang={lang} setLang={setLang} />
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               {Object.keys(formatConfig).map(fmt => <button key={fmt} onClick={() => {
                 setSelectedFormat(fmt);
                 setDownloadUrl(null);
@@ -163,6 +217,7 @@ export default function Home() {
 
           {/* Text Editor + Image Upload */}
           <div className="p-6 space-y-6">
+            <UploadZone onTextLoaded={(t, name) => { setText(t); setDownloadUrl(null); }} />
             {/* Image Upload Zone */}
             <div>
               <div className="flex items-center justify-between mb-3">
@@ -219,6 +274,18 @@ Alice, 30, New York
 Bob, 25, London`} className="min-h-[280px] font-mono text-sm resize-y bg-secondary/20 border-border focus:border-primary/50 focus:ring-primary/20" />
             </div>
 
+            <SmartFormatPanel text={text} setText={setText} options={smartOptions} setOptions={setSmartOptions} />
+
+            <AIPanel text={text} setText={setText} />
+
+            <OfflinePanel text={text} />
+
+            <BrandKitPanel options={smartOptions} setOptions={setSmartOptions} />
+
+            <ImagePanel options={smartOptions} setOptions={setSmartOptions} />
+
+            <WorkspacePanels text={text} setText={setText} options={smartOptions} setOptions={setSmartOptions} />
+
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <Button onClick={handleConvert} disabled={isConverting || !text.trim()} className="flex-1 h-12 text-base font-semibold gap-2 bg-primary hover:bg-primary/90">
@@ -227,15 +294,21 @@ Bob, 25, London`} className="min-h-[280px] font-mono text-sm resize-y bg-seconda
                   Generating...
                 </> : <>
                   <Sparkles className="w-5 h-5" />
-                  Convert to {formatConfig[selectedFormat].label}
+                  Convert to {(formatConfig[selectedFormat] || {}).label || selectedFormat}
                 </>}
               </Button>
 
               {downloadUrl && <Button onClick={handleDownload} variant="outline" className="flex-1 h-12 text-base font-semibold gap-2 border-2 border-emerald-500/30 text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950/40">
                 <ArrowDownToLine className="w-5 h-5" />
-                Download .{formatConfig[selectedFormat].ext}
+                Download .{(formatConfig[selectedFormat] || {}).ext || selectedFormat}
               </Button>}
             </div>
+
+            <LivePreview text={text} options={{ ...smartOptions, rtl: lang === "ar" }} title={text.trim().split("\n")[0].substring(0, 80) || "Preview"} />
+
+            <BatchPanel format={selectedFormat} options={smartOptions} />
+
+            <SharePanel downloadUrl={downloadUrl} downloadFileName={downloadFileName} text={text} />
           </div>
         </div>
 

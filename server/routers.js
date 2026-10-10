@@ -3,6 +3,8 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { conversionRouter } from "./routers/conversion";
+import { aiRouter } from "./routers/ai";
+import { workspaceRouter } from "./routers/workspace";
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -20,5 +22,7 @@ export const appRouter = router({
       };
     })
   }),
-  conversion: conversionRouter
+  conversion: conversionRouter,
+  ai: aiRouter,
+  workspace: workspaceRouter
 });
