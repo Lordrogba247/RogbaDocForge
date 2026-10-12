@@ -40,8 +40,8 @@ export default function History() {
   if (!isAuthenticated) {
     return <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
         <LogIn className="w-12 h-12 text-muted-foreground" />
-        <h2 className="text-xl font-semibold text-foreground">Sign in to view history</h2>
-        <p className="text-muted-foreground text-sm">Your conversion history is saved securely to your account.</p>
+        <h2 className="font-display text-xl font-semibold text-foreground">Sign in to see your files</h2>
+        <p className="text-muted-foreground text-sm">Everything you make with RogbaDox is saved safely to your account.</p>
         <Button onClick={startLogin}>Sign In</Button>
       </div>;
   }
@@ -51,9 +51,9 @@ export default function History() {
           <ArrowLeft className="w-5 h-5" />
         </a>
         <div>
-          <h1 className="text-2xl font-serif font-bold text-foreground">Conversion History</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground">My documents</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {historyQuery.data ? `${historyQuery.data.length} conversions` : "Loading..."}
+            {historyQuery.data ? `${historyQuery.data.length} files made with RogbaDox` : "Loading..."}
           </p>
         </div>
       </div>
@@ -64,12 +64,12 @@ export default function History() {
       }).map((_, i) => <div key={i} className="h-16 bg-muted/50 rounded-xl animate-pulse" />)}
         </div> : historyQuery.data && historyQuery.data.length === 0 ? <div className="text-center py-16">
           <Clock className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">No conversions yet</h3>
+          <h3 className="font-display text-lg font-medium text-foreground mb-2">No documents yet</h3>
           <p className="text-muted-foreground text-sm mb-6">
-            Your conversion history will appear here.
+            Make your first polished file on the home page — it will show up here.
           </p>
           <a href="/">
-            <Button variant="outline">Start Converting</Button>
+            <Button variant="outline">Make my first file</Button>
           </a>
         </div> : <div className="space-y-3">
           {historyQuery.data?.map(item => <div key={item.id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:shadow-md transition-shadow">

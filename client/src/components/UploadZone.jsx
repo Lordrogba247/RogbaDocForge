@@ -45,7 +45,7 @@ export default function UploadZone({ onTextLoaded }) {
     <div>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-          <FileUp className="w-4 h-4" /> Upload document (9)
+          <FileUp className="w-4 h-4" /> Upload a file
         </h3>
       </div>
       <div

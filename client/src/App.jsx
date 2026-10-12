@@ -3,6 +3,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { startLogin } from "./const";
+import { Button } from "@/components/ui/button";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import History from "./pages/History";
@@ -13,6 +16,7 @@ function Navbar() {
     toggleTheme,
     switchable
   } = useTheme();
+  const { isAuthenticated, loading } = useAuth();
   return <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex items-center justify-between h-16">
         <a href="/" className="flex items-center gap-2.5">
@@ -25,14 +29,26 @@ function Navbar() {
               <polyline points="10 9 9 9 8 9" />
             </svg>
           </div>
-          <span className="font-serif text-xl font-bold tracking-tight text-foreground">
-            RogbaDocForge
+          <span className="font-display text-xl font-bold tracking-tight text-foreground">
+            RogbaDox
+          </span>
+          <span className="hidden sm:inline text-[11px] font-medium text-muted-foreground border border-border rounded-full px-2 py-0.5">
+            by Aderogba
           </span>
         </a>
-        <div className="flex items-center gap-3">
-          <a href="/history" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-md hover:bg-accent/50">
-            History
+        <div className="flex items-center gap-1 sm:gap-3">
+          <a href="#how-it-works" className="hidden md:inline text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-md hover:bg-accent/50">
+            How it works
           </a>
+          <a href="#features" className="hidden md:inline text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-md hover:bg-accent/50">
+            Features
+          </a>
+          <a href="/history" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-md hover:bg-accent/50">
+            My docs
+          </a>
+          {!loading && !isAuthenticated && <Button onClick={startLogin} size="sm" className="h-9 rounded-lg px-4 font-semibold shadow-sm">
+              Sign in
+            </Button>}
           {switchable && toggleTheme && <button onClick={toggleTheme} className="w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all" aria-label="Toggle theme">
               {theme === "dark" ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="5" />

@@ -1,4 +1,4 @@
-# RogbaDocForge — Node app with Python-based document conversion (Word, PDF,
+# RogbaDox — Node app with Python-based document conversion (Word, PDF,
 # PowerPoint, Excel, OCR). Render's default Node environment doesn't include
 # Python, Tesseract OCR, or the system libraries WeasyPrint needs to render
 # PDFs — so we use a Dockerfile to install everything explicitly.

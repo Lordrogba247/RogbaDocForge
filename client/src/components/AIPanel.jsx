@@ -56,16 +56,16 @@ export default function AIPanel({ text, setText }) {
   return (
     <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-3">
       <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-        <Wand2 className="w-4 h-4" /> AI writing (13-18)
+        <Wand2 className="w-4 h-4" /> Improve your writing with AI
       </h3>
       <Tabs defaultValue="fix">
         <TabsList>
-          <TabsTrigger value="fix">Grammar (13)</TabsTrigger>
-          <TabsTrigger value="rewrite">Rewrite (14)</TabsTrigger>
-          <TabsTrigger value="sum">Summary (15)</TabsTrigger>
-          <TabsTrigger value="gen">Outline (16)</TabsTrigger>
-          <TabsTrigger value="cite">Cite (17)</TabsTrigger>
-          <TabsTrigger value="sim">Originality (18)</TabsTrigger>
+          <TabsTrigger value="fix">Fix grammar</TabsTrigger>
+          <TabsTrigger value="rewrite">Rewrite</TabsTrigger>
+          <TabsTrigger value="sum">Summarize</TabsTrigger>
+          <TabsTrigger value="gen">Make outline</TabsTrigger>
+          <TabsTrigger value="cite">References</TabsTrigger>
+          <TabsTrigger value="sim">Check originality</TabsTrigger>
         </TabsList>
         <TabsContent value="fix" className="space-y-2">
           <div className="flex gap-2 items-center">

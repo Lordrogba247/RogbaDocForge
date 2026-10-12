@@ -181,28 +181,60 @@ export default function Home() {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/10" />
       <div className="relative container py-12 lg:py-20">
         <div className="text-center max-w-3xl mx-auto">
-          <h1 className="font-serif text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4">
-            Forge Your Documents
+          <span className="rgdx-hero-badge">✨ Free • No sign-up needed to try but sign in to view your history</span>
+          <h1 className="font-display text-4xl lg:text-6xl font-bold tracking-tight text-foreground mt-4 mb-4">
+            Turn rough text into polished documents
           </h1>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Convert text into Word, PDF, PowerPoint, or Excel files. Extract text from images with OCR. All in one elegant tool.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            <strong className="text-foreground">RogbaDox</strong> cleans up your writing, applies beautiful
+            formatting, and exports it as <strong className="text-foreground">Word, PDF, PowerPoint, Excel, HTML or Markdown</strong> —
+            perfect for letters, CVs, reports, theses, invoices and more.
           </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
+            <a href="#start" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors">
+              <Sparkles className="w-4 h-4" /> Start formatting — it's free
+            </a>
+            <a href="#how-it-works" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border bg-card font-semibold text-sm text-foreground hover:bg-accent/50 transition-colors">
+              See how it works
+            </a>
+          </div>
+        </div>
+        {/* How it works — plain-language 3 steps */}
+        <div id="how-it-works" className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto mt-10 scroll-mt-24">
+          <div className="rgdx-step-card">
+            <div className="rgdx-step-num">1</div>
+            <h3 className="font-display font-semibold text-foreground mb-1">Add your content</h3>
+            <p className="text-sm text-muted-foreground">Type, paste, upload a file (.txt, .docx, .pdf…), or extract text from a photo.</p>
+          </div>
+          <div className="rgdx-step-card">
+            <div className="rgdx-step-num">2</div>
+            <h3 className="font-display font-semibold text-foreground mb-1">Polish it</h3>
+            <p className="text-sm text-muted-foreground">Pick a template (CV, letter, report…), fix headings, or let AI improve your writing.</p>
+          </div>
+          <div className="rgdx-step-card">
+            <div className="rgdx-step-num">3</div>
+            <h3 className="font-display font-semibold text-foreground mb-1">Download &amp; share</h3>
+            <p className="text-sm text-muted-foreground">Export as Word or PDF, preview the result, then download or share via WhatsApp or email.</p>
+          </div>
         </div>
       </div>
     </section>
 
     {/* Main Converter */}
-    <section className="container pb-20 -mt-4">
+    <section id="start" className="container pb-20 -mt-4 scroll-mt-20">
       <div className="max-w-4xl mx-auto">
         <div className="bg-card rounded-2xl border border-border shadow-lg shadow-primary/5 overflow-hidden">
           {/* Format Selector */}
           <div className="p-6 border-b border-border">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                Output Format
+              <h2 className="font-display text-sm font-semibold text-foreground uppercase tracking-wider">
+                Step 1 — Choose your file type
               </h2>
               <LanguagePanel lang={lang} setLang={setLang} />
             </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              What do you want to download? Pick <strong className="text-foreground">Word</strong> for editing, <strong className="text-foreground">PDF</strong> for sharing or printing.
+            </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               {Object.keys(formatConfig).map(fmt => <button key={fmt} onClick={() => {
                 setSelectedFormat(fmt);
@@ -220,12 +252,15 @@ export default function Home() {
             <UploadZone onTextLoaded={(t, name) => { setText(t); setDownloadUrl(null); }} />
             {/* Image Upload Zone */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                   <ImageIcon className="w-4 h-4" />
-                  Image to Text (OCR)
+                  Step 2 — Add your content
                 </h3>
               </div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Upload a photo of handwritten or printed text and RogbaDox will read it for you (OCR).
+              </p>
               <div className="flex items-center gap-3">
                 <label className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-dashed border-border hover:border-primary/40 transition-colors cursor-pointer bg-secondary/30">
                   <Upload className="w-5 h-5 text-muted-foreground shrink-0" />
@@ -251,15 +286,18 @@ export default function Home() {
 
             {/* Text Area */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  Document Text
+                  Or type / paste your text
                 </h3>
                 <span className="text-xs text-muted-foreground">
                   {text.length} characters
                 </span>
               </div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Don't worry about messy formatting — RogbaDox fixes headings, spacing and lists automatically in the next step.
+              </p>
               <Textarea value={text} onChange={e => setText(e.target.value)} placeholder={`Type or paste your text here...
 
 # Heading 1
@@ -287,21 +325,29 @@ Bob, 25, London`} className="min-h-[280px] font-mono text-sm resize-y bg-seconda
             <WorkspacePanels text={text} setText={setText} options={smartOptions} setOptions={setSmartOptions} />
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-              <Button onClick={handleConvert} disabled={isConverting || !text.trim()} className="flex-1 h-12 text-base font-semibold gap-2 bg-primary hover:bg-primary/90">
-                {isConverting ? <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Generating...
-                </> : <>
-                  <Sparkles className="w-5 h-5" />
-                  Convert to {(formatConfig[selectedFormat] || {}).label || selectedFormat}
-                </>}
-              </Button>
+            <div className="pt-2">
+              <h3 className="font-display text-sm font-semibold text-foreground uppercase tracking-wider mb-2">
+                Step 4 — Get your polished file
+              </h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Click the big button, wait a few seconds, then download. Your formatting choices above are applied automatically.
+              </p>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <Button onClick={handleConvert} disabled={isConverting || !text.trim()} className="flex-1 h-12 text-base font-semibold gap-2 bg-primary hover:bg-primary/90">
+                  {isConverting ? <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Making your file...
+                  </> : <>
+                    <Sparkles className="w-5 h-5" />
+                    Make my {(formatConfig[selectedFormat] || {}).label || selectedFormat} file
+                  </>}
+                </Button>
 
-              {downloadUrl && <Button onClick={handleDownload} variant="outline" className="flex-1 h-12 text-base font-semibold gap-2 border-2 border-emerald-500/30 text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950/40">
-                <ArrowDownToLine className="w-5 h-5" />
-                Download .{(formatConfig[selectedFormat] || {}).ext || selectedFormat}
-              </Button>}
+                {downloadUrl && <Button onClick={handleDownload} variant="outline" className="flex-1 h-12 text-base font-semibold gap-2 border-2 border-emerald-500/30 text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950/40">
+                  <ArrowDownToLine className="w-5 h-5" />
+                  Download your file
+                </Button>}
+              </div>
             </div>
 
             <LivePreview text={text} options={{ ...smartOptions, rtl: lang === "ar" }} title={text.trim().split("\n")[0].substring(0, 80) || "Preview"} />
@@ -310,40 +356,41 @@ Bob, 25, London`} className="min-h-[280px] font-mono text-sm resize-y bg-seconda
 
             <SharePanel downloadUrl={downloadUrl} downloadFileName={downloadFileName} text={text} />
           </div>
+
+          {/* Sign-in nudge (optional now — conversion works either way) */}
+          {!isAuthenticated && <div className="mt-6 text-center">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent/50 border border-accent">
+              <LogIn className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                Want to keep your files? Sign in — it's free
+              </span>
+              <Button variant="outline" size="sm" onClick={startLogin} className="ml-2">
+                Sign In
+              </Button>
+            </div>
+          </div>}
+
+          {/* Signed-in bar: history link + who's signed in + sign out */}
+          {isAuthenticated && <div className="mt-6 flex flex-col items-center gap-2 text-center">
+            <a href="/history" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
+              See all my files &rarr;
+            </a>
+            <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Signed in{user?.name ? ` as ${user.name}` : ""}</span>
+              <button type="button" onClick={logout} className="text-primary hover:text-primary/80 font-medium underline underline-offset-2">
+                Sign out
+              </button>
+            </div>
+          </div>}
         </div>
-
-        {/* Sign-in nudge (optional now — conversion works either way) */}
-        {!isAuthenticated && <div className="mt-6 text-center">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent/50 border border-accent">
-            <LogIn className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              Sign in to save your conversion history
-            </span>
-            <Button variant="outline" size="sm" onClick={startLogin} className="ml-2">
-              Sign In
-            </Button>
-          </div>
-        </div>}
-
-        {/* Signed-in bar: history link + who's signed in + sign out */}
-        {isAuthenticated && <div className="mt-6 flex flex-col items-center gap-2 text-center">
-          <a href="/history" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
-            View your conversion history &rarr;
-          </a>
-          <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Signed in{user?.name ? ` as ${user.name}` : ""}</span>
-            <button type="button" onClick={logout} className="text-primary hover:text-primary/80 font-medium underline underline-offset-2">
-              Sign out
-            </button>
-          </div>
-        </div>}
       </div>
     </section>
 
     {/* Footer */}
     <footer className="border-t border-border py-8">
-      <div className="container text-center text-sm text-muted-foreground">
-        <p>RogbaDocForge &copy; {new Date().getFullYear()} - All rights reserved</p>
+      <div className="container text-center text-sm text-muted-foreground space-y-1">
+        <p className="font-display font-semibold text-foreground">RogbaDox <span className="font-normal text-muted-foreground">by Aderogba</span></p>
+        <p>Aderogba &copy; 2026 - All rights reserved</p>
       </div>
     </footer>
   </div>;

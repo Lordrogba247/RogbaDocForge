@@ -25,7 +25,7 @@ export default function LivePreview({ text, options, title }) {
     <div className="rounded-xl border border-border bg-card p-4 space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <Eye className="w-4 h-4" /> Live preview (11)
+          <Eye className="w-4 h-4" /> See before & after
         </h3>
         <Tabs value={mode} onValueChange={setMode}>
           <TabsList>

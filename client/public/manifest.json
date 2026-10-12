@@ -1,7 +1,7 @@
 {
-  "name": "RogbaDocForge",
-  "short_name": "DocForge",
-  "description": "Smart document formatter — Word, PDF, HTML, Markdown",
+  "name": "RogbaDox",
+  "short_name": "RogbaDox",
+  "description": "RogbaDox by Aderogba — turn rough text into polished Word, PDF, HTML and Markdown documents",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

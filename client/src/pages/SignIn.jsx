@@ -71,13 +71,13 @@ export default function SignIn() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold tracking-tight text-foreground mb-2">
-            {mode === "signIn" ? "Welcome back" : "Create your account"}
+          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground mb-2">
+            {mode === "signIn" ? "Welcome back to RogbaDox" : "Join RogbaDox — it's free"}
           </h1>
           <p className="text-sm text-muted-foreground">
             {mode === "signIn"
-              ? "Sign in to convert documents and save your history."
-              : "Sign up to start converting documents."}
+              ? "Sign in to find all your polished files in one place."
+              : "Create a free account to save your files and favorite settings."}
           </p>
         </div>
 

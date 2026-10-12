@@ -43,7 +43,7 @@ export default function BatchPanel({ format, options }) {
     <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <Layers className="w-4 h-4" /> Batch formatting (12) — up to 10 docs
+          <Layers className="w-4 h-4" /> Make many files at once
         </h3>
         <Button variant="outline" size="sm" onClick={addItem}><Plus className="w-3 h-3 mr-1" />Add doc</Button>
       </div>

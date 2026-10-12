@@ -29,7 +29,7 @@ export default function ImagePanel({ options, setOptions }) {
   return (
     <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-3">
       <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-        <ImagePlus className="w-4 h-4" /> Images (21) + Tables (22 auto)
+        <ImagePlus className="w-4 h-4" /> Add photos & tables
       </h3>
       <div className="flex gap-2">
         <Input placeholder="Caption (optional)" value={caption} onChange={(e) => setCaption(e.target.value)} />

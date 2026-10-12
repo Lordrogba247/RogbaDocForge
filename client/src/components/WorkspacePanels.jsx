@@ -67,7 +67,7 @@ export default function WorkspacePanels({ text, setText, options, setOptions }) 
     <div className="grid md:grid-cols-2 gap-3">
       <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-3">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <Save className="w-4 h-4" /> My templates (24)
+          <Save className="w-4 h-4" /> Save your favorite settings
         </h3>
         <div className="flex gap-2">
           <Input placeholder="Template name" value={tplName} onChange={(e) => setTplName(e.target.value)} />
@@ -93,7 +93,7 @@ export default function WorkspacePanels({ text, setText, options, setOptions }) 
       </div>
       <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-3">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <History className="w-4 h-4" /> Versions (25)
+          <History className="w-4 h-4" /> Undo mistakes
         </h3>
         <Button size="sm" variant="outline" onClick={saveVersionLocal} disabled={saveVerM.isPending}>
           {saveVerM.isPending ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}Save snapshot

@@ -1,5 +1,5 @@
 const CACHE = "rdf-v2";
-const CORE = ["/", "/index.html", "/manifest.json"];
+const CORE = ["/", "/index.html", "/site.webmanifest"];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
 });

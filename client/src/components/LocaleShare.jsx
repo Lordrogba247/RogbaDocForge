@@ -24,7 +24,7 @@ export function LanguagePanel({ lang, setLang }) {
       <Select value={lang} onValueChange={setLang}>
         <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="en">English (28)</SelectItem>
+          <SelectItem value="en">English</SelectItem>
           <SelectItem value="yo">Yoruba</SelectItem>
           <SelectItem value="ha">Hausa</SelectItem>
           <SelectItem value="ar">Arabic (RTL)</SelectItem>
@@ -52,7 +52,7 @@ export function OfflinePanel({ text }) {
   if (online) return null;
   return (
     <div className="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 text-sm flex items-center gap-2">
-      <WifiOff className="w-4 h-4" /> Offline mode (29) — your text is auto-saved locally. Convert will retry when back online.
+      <WifiOff className="w-4 h-4" /> You're offline — your text is saved on this device. Reconnect, then try again.
     </div>
   );
 }
@@ -75,7 +75,7 @@ export function SharePanel({ downloadUrl, downloadFileName, text }) {
   return (
     <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-3">
       <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-        <Share2 className="w-4 h-4" /> Share (30)
+        <Share2 className="w-4 h-4" /> Send or share your file
       </h3>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" onClick={nativeShare}><Share2 className="w-3 h-3 mr-1" />Share / Copy link</Button>

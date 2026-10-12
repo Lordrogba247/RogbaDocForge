@@ -41,7 +41,7 @@ export default function BrandKitPanel({ options, setOptions }) {
   return (
     <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-3">
       <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-        <Palette className="w-4 h-4" /> Brand kit (19) {isAuthenticated ? "" : "— sign in to save"}
+        <Palette className="w-4 h-4" /> Your logo & colors {isAuthenticated ? "" : "— sign in to save"}
       </h3>
       <div className="grid sm:grid-cols-3 gap-2">
         <div><label className="text-xs">Primary color</label><Input type="color" value={brand.primaryColor} onChange={(e) => set("primaryColor", e.target.value)} className="h-9 p-1" /></div>
@@ -49,11 +49,11 @@ export default function BrandKitPanel({ options, setOptions }) {
         <div><label className="text-xs">Font</label><Input value={brand.font} onChange={(e) => set("font", e.target.value)} placeholder="Calibri" /></div>
       </div>
       <div className="grid sm:grid-cols-2 gap-2">
-        <Input placeholder="Watermark text (23)" value={brand.watermark} onChange={(e) => set("watermark", e.target.value)} />
+        <Input placeholder="Watermark (e.g. DRAFT)" value={brand.watermark} onChange={(e) => set("watermark", e.target.value)} />
         <Input placeholder="Logo URL (optional)" value={brand.logoUrl} onChange={(e) => set("logoUrl", e.target.value)} />
       </div>
       <div className="grid sm:grid-cols-2 gap-2">
-        <Input placeholder="Signature name (23)" value={brand.signatureName} onChange={(e) => set("signatureName", e.target.value)} />
+        <Input placeholder="Your name for signing" value={brand.signatureName} onChange={(e) => set("signatureName", e.target.value)} />
         <Input placeholder="Signature title" value={brand.signatureTitle} onChange={(e) => set("signatureTitle", e.target.value)} />
       </div>
       <div className="flex gap-2">
