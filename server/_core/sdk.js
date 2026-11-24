@@ -26,19 +26,19 @@ class SDKServer {
    */
   async verifySupabaseToken(accessToken) {
     if (!accessToken) {
-      console.warn("[Auth] Missing access token in request");
+      console.warn("[ServerAuth] Missing access token in request");
       return null;
     }
     try {
       const { data, error } = await this.supabase.auth.getUser(accessToken);
       if (error || !data?.user) {
-        console.warn("[Auth] Token verification failed:", error?.message, "token prefix:", accessToken.substring(0, 20) + "...");
+        console.warn("[ServerAuth] Token verification failed — error:", error?.message, "| token prefix:", accessToken.substring(0, 20) + "...", "| data.user present:", Boolean(data?.user));
         return null;
       }
-      console.log("[Auth] Token verified for user:", data.user.id, data.user.email);
+      console.log("[ServerAuth] Token verification succeeded — user id:", data.user.id, "| email:", data.user.email);
       return data.user;
     } catch (error) {
-      console.warn("[Auth] Token verification threw:", String(error));
+      console.warn("[ServerAuth] Token verification threw — error:", String(error));
       return null;
     }
   }
@@ -54,12 +54,13 @@ class SDKServer {
     let accessToken;
     if (typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
       accessToken = authHeader.slice(7);
-      console.log("[Auth] Received Bearer token (prefix:", accessToken.substring(0, 20) + "...)");
+      console.log("[ServerAuth] Received Bearer token (prefix:", accessToken.substring(0, 20) + "...)");
     } else {
-      console.warn("[Auth] No Authorization header or not a Bearer token. Header:", authHeader ? "present" : "missing");
+      console.warn("[ServerAuth] No Authorization header or not a Bearer token. Header present:", Boolean(authHeader));
     }
     const supaUser = await this.verifySupabaseToken(accessToken);
     if (!supaUser) {
+      console.warn("[ServerAuth] Token verification returned no user — throwing ForbiddenError");
       throw ForbiddenError("Invalid or missing session");
     }
     const openId = supaUser.id;
@@ -67,8 +68,10 @@ class SDKServer {
     const name = supaUser.user_metadata?.full_name || supaUser.user_metadata?.name || (email ? email.split("@")[0] : "User");
     const loginMethod = this.deriveLoginMethod(supaUser.app_metadata);
     const signedInAt = new Date();
+    console.log("[ServerAuth] Looking up user row by openId:", openId);
     let user = await db.getUserByOpenId(openId);
     if (!user) {
+      console.log("[ServerAuth] No user row found for openId:", openId, "— creating row automatically");
       await db.upsertUser({
         openId,
         name,
@@ -77,14 +80,17 @@ class SDKServer {
         lastSignedIn: signedInAt
       });
       user = await db.getUserByOpenId(openId);
+      if (!user) {
+        console.warn("[ServerAuth] User row still not found after auto-creation for openId:", openId);
+        throw ForbiddenError("User row could not be created");
+      }
+      console.log("[ServerAuth] User row created successfully for openId:", openId);
     } else {
+      console.log("[ServerAuth] User row found for openId:", openId, "| email:", user.email);
       await db.upsertUser({
         openId: user.openId,
         lastSignedIn: signedInAt
       });
-    }
-    if (!user) {
-      throw ForbiddenError("User not found");
     }
     return user;
   }
