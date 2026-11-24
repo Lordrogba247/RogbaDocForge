@@ -57,6 +57,15 @@ export function useAuth(options) {
       localStorage.setItem("manus-runtime-user-info", JSON.stringify(meQuery.data));
     } catch {}
   }, [meQuery.data]);
+  // Log auth state changes for debugging.
+  useEffect(() => {
+    console.log("[Auth] State changed:", {
+      isAuthenticated: state.isAuthenticated,
+      user: state.user?.email ?? null,
+      loading: state.loading,
+      error: state.error?.message ?? null
+    });
+  }, [state.isAuthenticated, state.user, state.loading, state.error]);
   useEffect(() => {
     if (!redirectOnUnauthenticated) return;
     if (meQuery.isLoading || logoutMutation.isPending) return;

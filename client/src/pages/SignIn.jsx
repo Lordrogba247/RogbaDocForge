@@ -21,11 +21,20 @@ export default function SignIn() {
     setLoading(true);
     try {
       if (mode === "signIn") {
+        console.log("[Auth] Attempting sign in with:", email);
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
-        if (error) throw error;
+        if (error) {
+          console.error("[Auth] signInWithPassword error:", error);
+          throw error;
+        }
+        console.log("[Auth] signInWithPassword result:", {
+          hasSession: Boolean(data?.session),
+          sessionAccessToken: data?.session?.access_token ? "present" : "missing",
+          user: data?.user?.email
+        });
         // Verify a session was actually created. Supabase may return
         // error: null but session: null when email confirmation is required.
         if (!data?.session) {
@@ -36,6 +45,10 @@ export default function SignIn() {
         }
         // Double-check the session is persisted in storage before redirecting.
         const { data: sessionData } = await supabase.auth.getSession();
+        console.log("[Auth] getSession after sign in:", {
+          hasSession: Boolean(sessionData?.session),
+          accessToken: sessionData?.session?.access_token ? "present" : "missing"
+        });
         if (!sessionData?.session) {
           toast.error("Session could not be persisted. Please try again.");
           return;
