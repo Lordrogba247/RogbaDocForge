@@ -40,6 +40,11 @@ const trpcClient = trpc.createClient({
       // can verify who's calling. Anonymous requests simply send none.
       const { data } = await supabase.auth.getSession();
       const token = data.session?.access_token;
+      if (token) {
+        console.log("[Auth] Sending Bearer token (prefix:", token.substring(0, 20) + "...)");
+      } else {
+        console.log("[Auth] No session available — sending anonymous request");
+      }
       return token ? {
         Authorization: `Bearer ${token}`
       } : {};

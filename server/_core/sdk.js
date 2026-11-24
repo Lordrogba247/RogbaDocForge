@@ -26,15 +26,16 @@ class SDKServer {
    */
   async verifySupabaseToken(accessToken) {
     if (!accessToken) {
-      console.warn("[Auth] Missing access token");
+      console.warn("[Auth] Missing access token in request");
       return null;
     }
     try {
       const { data, error } = await this.supabase.auth.getUser(accessToken);
       if (error || !data?.user) {
-        console.warn("[Auth] Token verification failed:", error?.message);
+        console.warn("[Auth] Token verification failed:", error?.message, "token prefix:", accessToken.substring(0, 20) + "...");
         return null;
       }
+      console.log("[Auth] Token verified for user:", data.user.id, data.user.email);
       return data.user;
     } catch (error) {
       console.warn("[Auth] Token verification threw:", String(error));
@@ -53,6 +54,9 @@ class SDKServer {
     let accessToken;
     if (typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
       accessToken = authHeader.slice(7);
+      console.log("[Auth] Received Bearer token (prefix:", accessToken.substring(0, 20) + "...)");
+    } else {
+      console.warn("[Auth] No Authorization header or not a Bearer token. Header:", authHeader ? "present" : "missing");
     }
     const supaUser = await this.verifySupabaseToken(accessToken);
     if (!supaUser) {

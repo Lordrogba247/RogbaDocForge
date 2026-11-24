@@ -21,11 +21,25 @@ export default function SignIn() {
     setLoading(true);
     try {
       if (mode === "signIn") {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
         if (error) throw error;
+        // Verify a session was actually created. Supabase may return
+        // error: null but session: null when email confirmation is required.
+        if (!data?.session) {
+          toast.error(
+            "Sign in completed but no session was created. Please check your email to confirm your account, then try again."
+          );
+          return;
+        }
+        // Double-check the session is persisted in storage before redirecting.
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData?.session) {
+          toast.error("Session could not be persisted. Please try again.");
+          return;
+        }
         toast.success("Signed in!");
         // Full reload so every part of the app picks up the new session.
         window.location.href = "/";
