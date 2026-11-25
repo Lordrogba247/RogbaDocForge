@@ -1,0 +1,2 @@
+◇ injected env (6) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+❌ Error creating users table: Connection lost: The server closed the connection.
