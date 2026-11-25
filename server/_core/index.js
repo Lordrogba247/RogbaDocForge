@@ -6,7 +6,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers.js";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import * as db from "./db.js";
+import * as db from "./db";
 
 async function ensureDatabaseTables() {
   const database = await db.getDb();

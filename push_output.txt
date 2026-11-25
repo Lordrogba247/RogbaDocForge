@@ -1,4 +1,0 @@
-error: src refspec ; does not match any
-error: src refspec cat does not match any
-error: src refspec push_output.txt does not match any
-error: failed to push some refs to 'https://github.com/Lordrogba247/RogbaDocForge.git'
