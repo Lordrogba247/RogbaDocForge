@@ -17,92 +17,36 @@ async function ensureDatabaseTables() {
   let connection;
   try {
     connection = await mysql.createConnection(databaseUrl);
-
-    await connection.query(`
-      CREATE TABLE IF NOT EXISTS \`users\` (
-        \`id\` int AUTO_INCREMENT NOT NULL,
-        \`openId\` varchar(64) NOT NULL,
-        \`name\` text,
-        \`email\` varchar(320),
-        \`loginMethod\` varchar(64),
-        \`role\` enum('user','admin') DEFAULT 'user' NOT NULL,
-        \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        \`updatedAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        \`lastSignedIn\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (\`id\`),
-        UNIQUE KEY \`users_openId_unique\` (\`openId\`)
-      )
-    `);
+  } catch (error) {
+    console.error("[Database] Failed to connect to MySQL:", error.message);
+    return;
+  }
+  try {
+    await connection.query("CREATE TABLE IF NOT EXISTS `users` (`id` int AUTO_INCREMENT NOT NULL, `openId` varchar(64) NOT NULL, `name` text, `email` varchar(320), `loginMethod` varchar(64), `role` enum('user','admin') DEFAULT 'user' NOT NULL, `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, `lastSignedIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`), UNIQUE KEY `users_openId_unique` (`openId`))");
     console.log("[Database] users table ensured");
   } catch (error) {
     console.error("[Database] Failed to create users table:", error.message);
   }
   try {
-    await connection.query(`
-      CREATE TABLE IF NOT EXISTS \`conversions\` (
-        \`id\` int AUTO_INCREMENT NOT NULL,
-        \`userId\` int NOT NULL,
-        \`format\` varchar(16) NOT NULL,
-        \`text\` text NOT NULL,
-        \`fileName\` varchar(256) NOT NULL,
-        \`fileUrl\` text NOT NULL,
-        \`fileKey\` text NOT NULL,
-        \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (\`id\`)
-      )
-    `);
+    await connection.query("CREATE TABLE IF NOT EXISTS `conversions` (`id` int AUTO_INCREMENT NOT NULL, `userId` int NOT NULL, `format` varchar(16) NOT NULL, `text` text NOT NULL, `fileName` varchar(256) NOT NULL, `fileUrl` text NOT NULL, `fileKey` text NOT NULL, `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`))");
     console.log("[Database] conversions table ensured");
   } catch (error) {
     console.error("[Database] Failed to create conversions table:", error.message);
   }
   try {
-    await connection.query(`
-      CREATE TABLE IF NOT EXISTS \`brandKits\` (
-        \`id\` int AUTO_INCREMENT NOT NULL,
-        \`userId\` int NOT NULL,
-        \`logoUrl\` text,
-        \`primaryColor\` varchar(16) DEFAULT '#6d28d9',
-        \`headingColor\` varchar(16) DEFAULT '#1e1b4b',
-        \`font\` varchar(64) DEFAULT 'Calibri',
-        \`watermark\` varchar(128) DEFAULT '',
-        \`signatureName\` varchar(128) DEFAULT '',
-        \`signatureTitle\` varchar(128) DEFAULT '',
-        \`updatedAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        PRIMARY KEY (\`id\`),
-        UNIQUE KEY \`brandKits_userId_unique\` (\`userId\`)
-      )
-    `);
+    await connection.query("CREATE TABLE IF NOT EXISTS `brandKits` (`id` int AUTO_INCREMENT NOT NULL, `userId` int NOT NULL, `logoUrl` text, `primaryColor` varchar(16) DEFAULT '#6d28d9', `headingColor` varchar(16) DEFAULT '#1e1b4b', `font` varchar(64) DEFAULT 'Calibri', `watermark` varchar(128) DEFAULT '', `signatureName` varchar(128) DEFAULT '', `signatureTitle` varchar(128) DEFAULT '', `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`id`), UNIQUE KEY `brandKits_userId_unique` (`userId`))");
     console.log("[Database] brandKits table ensured");
   } catch (error) {
     console.error("[Database] Failed to create brandKits table:", error.message);
   }
   try {
-    await connection.query(`
-      CREATE TABLE IF NOT EXISTS \`customTemplates\` (
-        \`id\` int AUTO_INCREMENT NOT NULL,
-        \`userId\` int NOT NULL,
-        \`name\` varchar(128) NOT NULL,
-        \`optionsJson\` text NOT NULL,
-        \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (\`id\`)
-      )
-    `);
+    await connection.query("CREATE TABLE IF NOT EXISTS `customTemplates` (`id` int AUTO_INCREMENT NOT NULL, `userId` int NOT NULL, `name` varchar(128) NOT NULL, `optionsJson` text NOT NULL, `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`))");
     console.log("[Database] customTemplates table ensured");
   } catch (error) {
     console.error("[Database] Failed to create customTemplates table:", error.message);
   }
   try {
-    await connection.query(`
-      CREATE TABLE IF NOT EXISTS \`docVersions\` (
-        \`id\` int AUTO_INCREMENT NOT NULL,
-        \`userId\` int NOT NULL,
-        \`docKey\` varchar(128) NOT NULL DEFAULT 'main',
-        \`text\` text NOT NULL,
-        \`label\` varchar(128) DEFAULT '',
-        \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (\`id\`)
-      )
-    `);
+    await connection.query("CREATE TABLE IF NOT EXISTS `docVersions` (`id` int AUTO_INCREMENT NOT NULL, `userId` int NOT NULL, `docKey` varchar(128) NOT NULL DEFAULT 'main', `text` text NOT NULL, `label` varchar(128) DEFAULT '', `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`))");
     console.log("[Database] docVersions table ensured");
   } catch (error) {
     console.error("[Database] Failed to create docVersions table:", error.message);
