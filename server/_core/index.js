@@ -15,7 +15,7 @@ async function ensureDatabaseTables() {
     return;
   }
   try {
-    await database.query(`
+    await database.execute(`
       CREATE TABLE IF NOT EXISTS \`users\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`openId\` varchar(64) NOT NULL,
@@ -35,7 +35,7 @@ async function ensureDatabaseTables() {
     console.error("[Database] Failed to create users table:", error.message);
   }
   try {
-    await database.query(`
+    await database.execute(`
       CREATE TABLE IF NOT EXISTS \`conversions\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`userId\` int NOT NULL,
@@ -53,7 +53,7 @@ async function ensureDatabaseTables() {
     console.error("[Database] Failed to create conversions table:", error.message);
   }
   try {
-    await database.query(`
+    await database.execute(`
       CREATE TABLE IF NOT EXISTS \`brandKits\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`userId\` int NOT NULL,
@@ -74,7 +74,7 @@ async function ensureDatabaseTables() {
     console.error("[Database] Failed to create brandKits table:", error.message);
   }
   try {
-    await database.query(`
+    await database.execute(`
       CREATE TABLE IF NOT EXISTS \`customTemplates\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`userId\` int NOT NULL,
@@ -89,7 +89,7 @@ async function ensureDatabaseTables() {
     console.error("[Database] Failed to create customTemplates table:", error.message);
   }
   try {
-    await database.query(`
+    await database.execute(`
       CREATE TABLE IF NOT EXISTS \`docVersions\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`userId\` int NOT NULL,
