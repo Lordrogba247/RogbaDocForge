@@ -6,16 +6,19 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers.js";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import * as db from "../db";
+import mysql from "mysql2/promise";
 
 async function ensureDatabaseTables() {
-  const database = await db.getDb();
-  if (!database) {
-    console.warn("[Database] Skipping table creation — database not available");
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.warn("[Database] Skipping table creation — DATABASE_URL not set");
     return;
   }
+  let connection;
   try {
-    await database.execute(`
+    connection = await mysql.createConnection(databaseUrl);
+
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS \`users\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`openId\` varchar(64) NOT NULL,
@@ -35,7 +38,7 @@ async function ensureDatabaseTables() {
     console.error("[Database] Failed to create users table:", error.message);
   }
   try {
-    await database.execute(`
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS \`conversions\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`userId\` int NOT NULL,
@@ -53,7 +56,7 @@ async function ensureDatabaseTables() {
     console.error("[Database] Failed to create conversions table:", error.message);
   }
   try {
-    await database.execute(`
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS \`brandKits\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`userId\` int NOT NULL,
@@ -74,7 +77,7 @@ async function ensureDatabaseTables() {
     console.error("[Database] Failed to create brandKits table:", error.message);
   }
   try {
-    await database.execute(`
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS \`customTemplates\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`userId\` int NOT NULL,
@@ -89,7 +92,7 @@ async function ensureDatabaseTables() {
     console.error("[Database] Failed to create customTemplates table:", error.message);
   }
   try {
-    await database.execute(`
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS \`docVersions\` (
         \`id\` int AUTO_INCREMENT NOT NULL,
         \`userId\` int NOT NULL,
@@ -103,6 +106,8 @@ async function ensureDatabaseTables() {
     console.log("[Database] docVersions table ensured");
   } catch (error) {
     console.error("[Database] Failed to create docVersions table:", error.message);
+  } finally {
+    if (connection) await connection.end();
   }
 }
 function isPortAvailable(port) {
